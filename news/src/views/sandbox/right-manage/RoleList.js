@@ -1,7 +1,9 @@
 import React from 'react'
 
 export default function RoleList() {
-  return (
-    <div>RoleList</div>
-  )
+    return (
+        <div>
+            RoleList
+        </div>
+    )
 }

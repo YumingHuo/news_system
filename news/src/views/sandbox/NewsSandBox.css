@@ -16,6 +16,10 @@
     background: rgba(255, 255, 255, 0.3);
   }
   
-  #root, ant-layout {
-    height: 100%;
+  .site-layout .site-layout-background {
+    background: #fff;
+  }
+
+  #root,.ant-layout{
+      height: 100%;
   }
