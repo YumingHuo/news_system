@@ -10,7 +10,7 @@ export default function IndexRouter() {
                 {/* <Route path="/" component={NewsSandBox}/> */}
                 <Route path="/" render={()=>
                     localStorage.getItem("token")?
-                    <NewsSandBox></NewsSandBox>:
+                    <NewsSandBox ></NewsSandBox>:
                     <Redirect to="/login"/>
                 }/>
             </Switch>
