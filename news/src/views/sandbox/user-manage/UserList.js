@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import { Button, Table, Modal, Switch,Form,Input,Select } from 'antd'
+import React, { useState, useEffect, useRef } from 'react'
+import { Button, Table, Modal, Switch } from 'antd'
 import axios from 'axios'
 import { DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
+import UserForm from '../../../components/user-manage/UserForm'
 const { confirm } = Modal
-const { Option } = Select;
 
 export default function UserList() {
     const [dataSource, setdataSource] = useState([])
     const [isAddVisible, setisAddVisible] = useState(false)
     const [roleList, setroleList] = useState([])
     const [regionList, setregionList] = useState([])
+    const addForm = useRef(null)
     useEffect(() => {
         axios.get("http://localhost:5000/users?_expand=role").then(res => {
             const list = res.data
@@ -91,9 +92,29 @@ export default function UserList() {
 
     }
 
+    const addFormOK = () => {
+        addForm.current.validateFields().then(value => {
+            // console.log(value)
+
+            setisAddVisible(false)
+
+            //post到后端，生成id，再设置 datasource, 方便后面的删除和更新
+            axios.post(`http://localhost:5000/users`, {
+                ...value,
+                "roleState": true,
+                "default": false,
+            }).then(res=>{
+                console.log(res.data)
+                setdataSource([...dataSource,res.data])
+            })
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+
     return (
         <div>
-            <Button type="primary" onClick={()=>{
+            <Button type="primary" onClick={() => {
                 setisAddVisible(true)
             }}>添加用户</Button>
             <Table dataSource={dataSource} columns={columns}
@@ -108,57 +129,12 @@ export default function UserList() {
                 title="添加用户"
                 okText="确定"
                 cancelText="取消"
-                onCancel={()=>{
+                onCancel={() => {
                     setisAddVisible(false)
                 }}
-                onOk={() => {
-                    console.log("add")
-                }}
+                onOk={() => addFormOK()}
             >
-                <Form
-                    layout="vertical"
-                >
-                    <Form.Item
-                        name="username"
-                        label="用户名"
-                        rules={[{ required: true, message: 'Please input the title of collection!' }]}
-                    >           
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="password"
-                        label="密码"
-                        rules={[{ required: true, message: 'Please input the title of collection!' }]}
-                    >           
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="region"
-                        label="区域"
-                        rules={[{ required: true, message: 'Please input the title of collection!' }]}
-                    >           
-                        <Select>
-                            {
-                                regionList.map(item=>
-                                <Option value={item.value} key={item.id}>{item.title}</Option>    
-                                )
-                            }
-                        </Select>
-                    </Form.Item>
-                    <Form.Item
-                        name="roleId"
-                        label="角色"
-                        rules={[{ required: true, message: 'Please input the title of collection!' }]}
-                    >           
-                        <Select>
-                            {
-                                roleList.map(item=>
-                                <Option value={item.id} key={item.id}>{item.roleName}</Option>    
-                                )
-                            }
-                        </Select>
-                    </Form.Item>
-                </Form>
+                <UserForm regionList={regionList} roleList={roleList} ref={addForm}></UserForm>
             </Modal>
 
         </div>
