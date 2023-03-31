@@ -7,6 +7,7 @@ export default function RoleList() {
     const [dataSource, setdataSource] = useState([])
     const [rightList, setRightList] = useState([])
     const [currentRights, setcurrentRights] = useState([])
+    const [currentId, setcurrentId] = useState(0)
     const [isModalVisible, setisModalVisible] = useState(false)
     const columns = [
         {
@@ -28,6 +29,7 @@ export default function RoleList() {
                     <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={()=>{
                         setisModalVisible(true)
                         setcurrentRights(item.rights)
+                        setcurrentId(item.id)
                     }}/>
                 </div>
             }
@@ -73,7 +75,23 @@ export default function RoleList() {
 
 
     const handleOk = ()=>{
+        console.log(currentRights,currentId)
+        setisModalVisible(false)
+        //同步datasource
+        setdataSource(dataSource.map(item=>{
+            if(item.id===currentId){
+                return {
+                    ...item,
+                    rights:currentRights
+                }
+            }
+            return item
+        }))
+        //patch
 
+        axios.patch(`http://localhost:5000/roles/${currentId}`,{
+            rights:currentRights
+        })
     }
 
     const handleCancel  =()=>{
@@ -82,7 +100,7 @@ export default function RoleList() {
 
     const onCheck = (checkKeys)=>{
         // console.log(checkKeys)
-        setcurrentRights(checkKeys)
+        setcurrentRights(checkKeys.checked)
     }
     return (
         <div>
