@@ -8,9 +8,13 @@ const { confirm } = Modal
 export default function UserList() {
     const [dataSource, setdataSource] = useState([])
     const [isAddVisible, setisAddVisible] = useState(false)
+    const [isUpdateVisible, setisUpdateVisible] = useState(false)
     const [roleList, setroleList] = useState([])
     const [regionList, setregionList] = useState([])
+
+    const [isUpdateDisabled, setisUpdateDisabled] = useState(false)
     const addForm = useRef(null)
+    const updateForm = useRef(null)
     useEffect(() => {
         axios.get("http://localhost:5000/users?_expand=role").then(res => {
             const list = res.data
@@ -55,7 +59,7 @@ export default function UserList() {
             title: "用户状态",
             dataIndex: 'roleState',
             render: (roleState, item) => {
-                return <Switch checked={roleState} disabled={item.default}></Switch>
+                return <Switch checked={roleState} disabled={item.default} onChange={()=>handleChange(item)}></Switch>
             }
         },
         {
@@ -64,11 +68,35 @@ export default function UserList() {
                 return <div>
                     <Button danger shape="circle" icon={<DeleteOutlined />} onClick={() => confirmMethod(item)} disabled={item.default} />
 
-                    <Button type="primary" shape="circle" icon={<EditOutlined />} disabled={item.default} />
+                    <Button type="primary" shape="circle" icon={<EditOutlined />} disabled={item.default} onClick={()=>handleUpdate(item)}/>
                 </div>
             }
         }
     ];
+
+    const handleUpdate = (item)=>{
+        setTimeout(()=>{
+            setisUpdateVisible(true)
+            if(item.roleId===1){
+                //禁用
+                setisUpdateDisabled(true)
+            }else{
+                //取消禁用
+                setisUpdateDisabled(false)
+            }
+            updateForm.current.setFieldsValue(item)
+        },0)
+    }
+
+    const handleChange = (item)=>{
+        // console.log(item)
+        item.roleState = !item.roleState
+        setdataSource([...dataSource])
+
+        axios.patch(`http://localhost:5000/users/${item.id}`,{
+            roleState:item.roleState
+        })
+    }
 
     const confirmMethod = (item) => {
         confirm({
@@ -119,6 +147,10 @@ export default function UserList() {
         })
     }
 
+    const updateFormOK = ()=>{
+
+    }
+
     return (
         <div>
             <Button type="primary" onClick={() => {
@@ -142,6 +174,20 @@ export default function UserList() {
                 onOk={() => addFormOK()}
             >
                 <UserForm regionList={regionList} roleList={roleList} ref={addForm}></UserForm>
+            </Modal>
+
+            <Modal
+                visible={isUpdateVisible}
+                title="更新用户"
+                okText="更新"
+                cancelText="取消"
+                onCancel={() => {
+                    setisUpdateVisible(false)
+                    setisUpdateDisabled(!isUpdateDisabled)
+                }}
+                onOk={() => updateFormOK()}
+            >
+                <UserForm regionList={regionList} roleList={roleList} ref={updateForm} isUpdateDisabled={isUpdateDisabled}></UserForm>
             </Modal>
 
         </div>
