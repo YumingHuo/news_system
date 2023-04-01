@@ -90,6 +90,9 @@ export default function UserList() {
         // console.log(item)
         // 当前页面同步状态 + 后端同步
 
+        setdataSource(dataSource.filter(data=>data.id!==item.id))
+
+        axios.delete(`http://localhost:5000/users/${item.id}`)
     }
 
     const addFormOK = () => {
@@ -98,6 +101,7 @@ export default function UserList() {
 
             setisAddVisible(false)
 
+            addForm.current.resetFields()
             //post到后端，生成id，再设置 datasource, 方便后面的删除和更新
             axios.post(`http://localhost:5000/users`, {
                 ...value,
@@ -105,7 +109,10 @@ export default function UserList() {
                 "default": false,
             }).then(res=>{
                 console.log(res.data)
-                setdataSource([...dataSource,res.data])
+                setdataSource([...dataSource,{
+                    ...res.data,
+                    role:roleList.filter(item=>item.id===value.roleId)[0]
+                }])
             })
         }).catch(err => {
             console.log(err)
