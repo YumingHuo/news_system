@@ -43,15 +43,26 @@ export default function NewsRouter() {
             // console.log(BackRouteList)
         })
     },[])
+
+    const {role:{rights}} = JSON.parse(localStorage.getItem("token"))
+
+    const checkRoute = (item)=>{
+        return LocalRouterMap[item.key] && item.pagepermisson
+    }
+
+    const checkUserPermission = (item)=>{
+        return rights.includes(item.key)
+    }
+
     return (
         <Switch>
             {
                 BackRouteList.map(item=>
                     {
-                        if(checkRoute() && checkUserPermission()){
+                        if(checkRoute(item) && checkUserPermission(item)){
                             return <Route path={item.key} key={item.key} component={LocalRouterMap[item.key]} exact/> 
                         }
-                        return <Nopermission/>
+                        return null
                     }   
                 )
             }
