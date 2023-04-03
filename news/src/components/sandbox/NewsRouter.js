@@ -14,6 +14,8 @@ import Unpublished from '../../views/sandbox/publish-manage/Unpublished'
 import Published from '../../views/sandbox/publish-manage/Published'
 import Sunset from '../../views/sandbox/publish-manage/Sunset'
 import axios from '_axios@0.21.1@axios'
+import NewsPreview from '../../views/sandbox/news-manage/NewsPreview'
+import NewsUpdate from '../../views/sandbox/news-manage/NewsUpdate'
 
 const LocalRouterMap = {
     "/home":Home,
@@ -23,6 +25,8 @@ const LocalRouterMap = {
     "/news-manage/add":NewsAdd,
     "/news-manage/draft":NewsDraft,
     "/news-manage/category":NewsCategory,
+    "/news-manage/preview/:id":NewsPreview,
+    "/news-manage/update/:id":NewsUpdate,
     "/audit-manage/audit":Audit,
     "/audit-manage/list":AuditList,
     "/publish-manage/unpublished":Unpublished,
@@ -47,7 +51,7 @@ export default function NewsRouter() {
     const {role:{rights}} = JSON.parse(localStorage.getItem("token"))
 
     const checkRoute = (item)=>{
-        return LocalRouterMap[item.key] && item.pagepermisson
+        return LocalRouterMap[item.key] && (item.pagepermisson || item.routepermisson)
     }
 
     const checkUserPermission = (item)=>{
