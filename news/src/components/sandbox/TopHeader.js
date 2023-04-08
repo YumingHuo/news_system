@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Layout, Dropdown,Menu ,Avatar} from 'antd';
 import {
     MenuUnfoldOutlined,
@@ -12,10 +12,12 @@ const { Header } = Layout;
 
 function TopHeader(props) {
 
-    console.log(props)
-    const [collapsed, setCollapsed] = useState(false)
+    // console.log(props)
+    // const [collapsed, setCollapsed] = useState(false)
     const changeCollapsed = () => {
-        setCollapsed(!collapsed)
+        //改变state的isCollapsed
+        // console.log(props)
+        props.changeCollapsed()
     }
 
     const {role:{roleName},username} = JSON.parse(localStorage.getItem("token"))
@@ -36,7 +38,7 @@ function TopHeader(props) {
     return (
         <Header className="site-layout-background" style={{ padding: '0 16px' }}>
             {
-                collapsed ? <MenuUnfoldOutlined onClick={changeCollapsed} /> : <MenuFoldOutlined onClick={changeCollapsed} />
+                props.isCollapsed ? <MenuUnfoldOutlined onClick={changeCollapsed} /> : <MenuFoldOutlined onClick={changeCollapsed} />
             }
 
             <div style={{ float: "right" }}>
@@ -63,4 +65,13 @@ const mapStateToProps = ({CollApsedReducer:{isCollapsed}})=>{
     }
 }
 
-export default connect(mapStateToProps)(withRouter(TopHeader))
+const mapDispatchToProps = {
+    changeCollapsed(){
+        return {
+            type: "change_collapsed"
+            // payload:
+        }//action 
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(withRouter(TopHeader))
